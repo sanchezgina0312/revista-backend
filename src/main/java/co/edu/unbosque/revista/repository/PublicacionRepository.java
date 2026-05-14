@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface PublicacionRepository extends CrudRepository<Publicacion, Long> {
 	
-	public Optional<List<Publicacion>> findByTipo(String tipo);
-    public Optional<List<Publicacion>> findByEditorId(Long editorId);
-    public Optional<List<Publicacion>> findByTitulo(String palabraClave);
+	public Optional<Publicacion> findByTipo(String tipo);
+    public Optional<Publicacion> findByEditorId(Long editorId);
+    public Optional<Publicacion> findByTitulo(String palabraClave);
 }
