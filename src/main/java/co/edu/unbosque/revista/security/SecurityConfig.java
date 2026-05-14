@@ -2,153 +2,68 @@ package co.edu.unbosque.revista.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.core.userdetails.UserDetailsService;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Configuración de seguridad de la aplicación.
- * Maneja autenticación JWT y autorización basada en roles.
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /**
-     * Filtro JWT personalizado.
-     */
-    private final JwtAuthenticationFilter jwtAuthFilter;
+	private final JwtAuthenticationFilter jwtAuthFilter;
+	private final UserDetailsService userDetailsService;
 
-    /**
-     * Servicio para cargar usuarios desde la base de datos.
-     */
-    private final UserDetailsService userDetailsService;
+	public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+		this.jwtAuthFilter = jwtAuthFilter;
+		this.userDetailsService = userDetailsService;
+	}
 
-    /**
-     * Constructor con inyección de dependencias.
-     *
-     * @param jwtAuthFilter filtro JWT
-     * @param userDetailsService servicio de usuarios
-     */
-    public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthFilter,
-            UserDetailsService userDetailsService) {
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth
+				.requestMatchers("/revista/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+				.requestMatchers("/revista/publicaciones/listar", "/revista/publicaciones/buscar/**")
+				.hasAnyRole("USUARIO", "COMENTADOR", "EDITOR", "ADMINISTRADOR")
+				.requestMatchers("/revista/publicaciones/crear", "/revista/publicaciones/actualizar/**",
+						"/revista/publicaciones/eliminar/**")
+				.hasAnyRole("ADMINISTRADOR").requestMatchers("/revista/publicaciones/crear").hasAnyRole("EDITOR")
 
-        this.jwtAuthFilter = jwtAuthFilter;
-        this.userDetailsService = userDetailsService;
-    }
+				.requestMatchers("/revista/comentarios/crear").hasAnyRole("COMENTADOR", "EDITOR", "ADMINISTRADOR")
+				.requestMatchers("/revista/usuarios/**", "/revista/comentarios/listar",
+						"/revista/comentarios/eliminar/**")
+				.hasRole("ADMINISTRADOR").anyRequest().authenticated())
 
-    /**
-     * Configuración principal de seguridad HTTP.
-     *
-     * @param http configuración HTTP
-     * @return cadena de filtros de seguridad
-     * @throws Exception excepción de configuración
-     */
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.authenticationProvider(authenticationProvider())
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http
-            .csrf(csrf -> csrf.disable())
+		return http.build();
+	}
 
-            .authorizeHttpRequests(auth -> auth
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+		authProvider.setPasswordEncoder(passwordEncoder());
 
-                // Endpoints públicos
-                .requestMatchers("/auth/**").permitAll()
+		return authProvider;
+	}
 
-                // Swagger
-                .requestMatchers(
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**")
-                .permitAll()
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
 
-                // Usuarios autenticados
-                .requestMatchers(
-                        "/user/getall",
-                        "/user/count",
-                        "/user/exists/**",
-                        "/user/getbyid/**")
-                .hasAnyRole("USUARIO", "ADMINISTRADOR")
-
-                // Solo administrador
-                .requestMatchers("/user/**")
-                .hasRole("ADMINISTRADOR")
-
-                // Todo lo demás requiere autenticación
-                .anyRequest()
-                .authenticated()
-            )
-
-            // API Stateless con JWT
-            .sessionManagement(session ->
-                    session.sessionCreationPolicy(
-                            SessionCreationPolicy.STATELESS))
-
-            // Proveedor de autenticación
-            .authenticationProvider(authenticationProvider())
-
-            // Filtro JWT
-            .addFilterBefore(
-                    jwtAuthFilter,
-                    UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    /**
-     * Proveedor de autenticación usando UserDetailsService.
-     *
-     * @return AuthenticationProvider
-     */
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-
-        DaoAuthenticationProvider authProvider =
-                new DaoAuthenticationProvider(userDetailsService);
-
-        authProvider.setPasswordEncoder(passwordEncoder());
-
-        return authProvider;
-    }
-
-    /**
-     * AuthenticationManager de Spring.
-     *
-     * @param config configuración de autenticación
-     * @return AuthenticationManager
-     * @throws Exception excepción de configuración
-     */
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config)
-            throws Exception {
-
-        return config.getAuthenticationManager();
-    }
-
-    /**
-     * Codificador BCrypt para contraseñas.
-     *
-     * @return PasswordEncoder
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }
