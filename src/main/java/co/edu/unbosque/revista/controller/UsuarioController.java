@@ -24,8 +24,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "*")
+@RequestMapping("/revista/usuarios")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8081"})
 @Tag(name = "Usuario", description = "Controlador para la gestión completa de usuarios de la revista")
 public class UsuarioController {
 
