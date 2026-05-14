@@ -1,6 +1,6 @@
 package co.edu.unbosque.revista.security;
 
-import co.edu.unbosque.springfirstapp.model.User;
+import co.edu.unbosque.revista.entity.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -119,9 +119,9 @@ public class JwtUtil {
     claims.put("authorities", userDetails.getAuthorities());
 
     // Añadir rol a las reclamaciones si userDetails es de nuestra clase User
-    if (userDetails instanceof User) {
-      User user = (User) userDetails;
-      claims.put("role", user.getRole().name());
+    if (userDetails instanceof Usuario) {
+    	Usuario user = (Usuario) userDetails;
+      claims.put("role", user.getRol().name());
     }
 
     return createToken(claims, userDetails.getUsername());

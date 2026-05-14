@@ -1,6 +1,6 @@
 package co.edu.unbosque.revista.security;
 
-import co.edu.unbosque.springfirstapp.repository.UserRepository;
+import co.edu.unbosque.revista.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,14 +17,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   /**
    * Repositorio de usuarios utilizado para buscar información de usuarios.
    */
-  private final UserRepository userRepository;
+  private final UsuarioRepository userRepository;
 
   /**
    * Constructor que inicializa el repositorio de usuarios.
    * 
    * @param userRepository El repositorio de usuarios a utilizar para las consultas
    */
-  public UserDetailsServiceImpl(UserRepository userRepository) {
+  public UserDetailsServiceImpl(UsuarioRepository userRepository) {
     this.userRepository = userRepository;
   }
 
@@ -39,7 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     // Busca el usuario en el repositorio y lanza una excepción si no se encuentra
     return userRepository
-        .findByUsername(username)
+        .findByNombre(username)
         .orElseThrow(
             () -> new UsernameNotFoundException("User not found with username: " + username));
   }
