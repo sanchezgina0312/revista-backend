@@ -9,16 +9,18 @@ public class ComentarioDTO {
 	private String texto;
 	private LocalDateTime fechaComentario;
 	private Long publicacionId;
+	private Long editorId;
 
 	public ComentarioDTO() {
 
 	}
 
-	public ComentarioDTO(String texto, LocalDateTime fechaComentario, Long publicacionId) {
+	public ComentarioDTO(String texto, LocalDateTime fechaComentario, Long publicacionId, Long editorId) {
 		super();
 		this.texto = texto;
 		this.fechaComentario = fechaComentario;
 		this.publicacionId = publicacionId;
+		this.editorId = editorId;
 	}
 
 	public Long getId() {
@@ -53,9 +55,17 @@ public class ComentarioDTO {
 		this.publicacionId = publicacionId;
 	}
 
+	public Long getEditorId() {
+		return editorId;
+	}
+
+	public void setEditorId(Long editorId) {
+		this.editorId = editorId;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaComentario, id, publicacionId, texto);
+		return Objects.hash(editorId, fechaComentario, id, publicacionId, texto);
 	}
 
 	@Override
@@ -67,14 +77,15 @@ public class ComentarioDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		ComentarioDTO other = (ComentarioDTO) obj;
-		return Objects.equals(fechaComentario, other.fechaComentario) && Objects.equals(id, other.id)
-				&& Objects.equals(publicacionId, other.publicacionId) && Objects.equals(texto, other.texto);
+		return Objects.equals(editorId, other.editorId) && Objects.equals(fechaComentario, other.fechaComentario)
+				&& Objects.equals(id, other.id) && Objects.equals(publicacionId, other.publicacionId)
+				&& Objects.equals(texto, other.texto);
 	}
 
 	@Override
 	public String toString() {
 		return "ComentarioDTO [id=" + id + ", texto=" + texto + ", fechaComentario=" + fechaComentario
-				+ ", publicacionId=" + publicacionId + "]";
+				+ ", publicacionId=" + publicacionId + ", editorId=" + editorId + "]";
 	}
 
 }
