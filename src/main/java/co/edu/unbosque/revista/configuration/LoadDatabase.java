@@ -1,6 +1,5 @@
 package co.edu.unbosque.revista.configuration;
 
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,37 +22,18 @@ public class LoadDatabase {
 
 	@Bean
 	CommandLineRunner initDatabase(UsuarioRepository userRepo, PasswordEncoder passwordEncoder) {
-		return args -> {
+	    return args -> {
+	        Usuario admin = userRepo.findByCorreo("administrador@gmail.com")
+	                .orElse(new Usuario());
 
-			Optional<Usuario> adminEncontrado = userRepo.findByNombre("Administrador Principal");
+	        admin.setNombre("admin");
+	        admin.setCorreo("administrador@gmail.com");
+	        admin.setContrasenia(passwordEncoder.encode("User2026*/s"));
+	        admin.setRol(Role.ADMINISTRADOR);
+	        admin.setActivado(true);
 
-			if (adminEncontrado.isPresent()) {
-				log.info("El administrador principal ya existe, saltando...");
-			} else {
-				Usuario admin = new Usuario();
-				admin.setNombre("Administrador Principal");
-				admin.setCorreo("administrador@gmail.com");
-				admin.setContrasenia(passwordEncoder.encode(defaultPassword));
-				admin.setRol(Role.ADMINISTRADOR);
-
-				userRepo.save(admin);
-				log.info("Precargando usuario ADMINISTRADOR");
-			}
-
-			Optional<Usuario> usuarioEncontrado = userRepo.findByNombre("Usuario");
-
-			if (usuarioEncontrado.isPresent()) {
-				log.info("El usuario normal ya existe, saltando...");
-			} else {
-				Usuario normalUser = new Usuario();
-				normalUser.setNombre("Usuario");
-				normalUser.setCorreo("usuario@gmail.com");
-				normalUser.setContrasenia(passwordEncoder.encode(defaultPassword));
-				normalUser.setRol(Role.USUARIO);
-
-				userRepo.save(normalUser);
-				log.info("Precargando usuario USUARIO");
-			}
-		};
+	        userRepo.save(admin);
+	        log.info("ADMINISTRADOR listo. Login: nombre='admin', clave='User2026*/s'");
+	    };
 	}
 }
