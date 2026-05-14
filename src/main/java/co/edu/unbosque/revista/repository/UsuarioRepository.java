@@ -11,4 +11,5 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
 	public Optional<List<Usuario>> findByNombre(String nombre);
 	public Optional<List<Usuario>> findByCorreo(String correo);
 	public Optional<List<Usuario>> findByRol(String rol);
+	public void deleteByNombre(String nombre);
 }
