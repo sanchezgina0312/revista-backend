@@ -77,29 +77,29 @@ public class PublicacionService {
 	}
 
 	public List<PublicacionDTO> findByTipo(String tipo) {
-		Optional<List<Publicacion>> encontrados = publicacionRep.findByTipo(tipo);
-		List<PublicacionDTO> dtoList = new ArrayList<>();
-		if (encontrados.isPresent() && !encontrados.get().isEmpty()) {
-			encontrados.get().forEach(entity -> dtoList.add(mapper.map(entity, PublicacionDTO.class)));
-		}
-		return dtoList;
+	    Optional<Publicacion> encontrada = publicacionRep.findByTipo(tipo);
+	    List<PublicacionDTO> dtoList = new ArrayList<>();
+	    if (encontrada.isPresent()) {
+	        dtoList.add(mapper.map(encontrada.get(), PublicacionDTO.class));
+	    }
+	    return dtoList;
 	}
 
 	public List<PublicacionDTO> findByEditorId(Long editorId) {
-		Optional<List<Publicacion>> encontrados = publicacionRep.findByEditorId(editorId);
-		List<PublicacionDTO> dtoList = new ArrayList<>();
-		if (encontrados.isPresent() && !encontrados.get().isEmpty()) {
-			encontrados.get().forEach(entity -> dtoList.add(mapper.map(entity, PublicacionDTO.class)));
-		}
-		return dtoList;
+	    Optional<Publicacion> encontrada = publicacionRep.findByEditorId(editorId);
+	    List<PublicacionDTO> dtoList = new ArrayList<>();
+	    if (encontrada.isPresent()) {
+	        dtoList.add(mapper.map(encontrada.get(), PublicacionDTO.class));
+	    }
+	    return dtoList;
 	}
 
 	public List<PublicacionDTO> findByTitulo(String palabraClave) {
-		Optional<List<Publicacion>> encontrados = publicacionRep.findByTitulo(palabraClave);
-		List<PublicacionDTO> dtoList = new ArrayList<>();
-		if (encontrados.isPresent() && !encontrados.get().isEmpty()) {
-			encontrados.get().forEach(entity -> dtoList.add(mapper.map(entity, PublicacionDTO.class)));
-		}
-		return dtoList;
+	    Optional<Publicacion> encontrada = publicacionRep.findByTitulo(palabraClave);
+	    List<PublicacionDTO> dtoList = new ArrayList<>();
+	    if (encontrada.isPresent()) {
+	        dtoList.add(mapper.map(encontrada.get(), PublicacionDTO.class));
+	    }
+	    return dtoList;
 	}
 }

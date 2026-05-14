@@ -2,112 +2,153 @@ package co.edu.unbosque.revista.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Clase de configuración de seguridad para la aplicación. Configura la
- * autenticación y autorización basada en JWT.
+ * Configuración de seguridad de la aplicación.
+ * Maneja autenticación JWT y autorización basada en roles.
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-	/** Filtro de autenticación JWT que procesa los tokens en las solicitudes. */
-	private final JwtAuthenticationFilter jwtAuthFilter;
+    /**
+     * Filtro JWT personalizado.
+     */
+    private final JwtAuthenticationFilter jwtAuthFilter;
 
-	/** Servicio que carga los detalles del usuario para la autenticación. */
-	private final UserDetailsService userDetailsService;
+    /**
+     * Servicio para cargar usuarios desde la base de datos.
+     */
+    private final UserDetailsService userDetailsService;
 
-	/**
-	 * Constructor que inicializa los componentes necesarios para la seguridad.
-	 *
-	 * @param jwtAuthFilter      Filtro para procesar tokens JWT
-	 * @param userDetailsService Servicio para cargar detalles de usuarios
-	 */
-	public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
-		this.jwtAuthFilter = jwtAuthFilter;
-		this.userDetailsService = userDetailsService;
-	}
+    /**
+     * Constructor con inyección de dependencias.
+     *
+     * @param jwtAuthFilter filtro JWT
+     * @param userDetailsService servicio de usuarios
+     */
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthFilter,
+            UserDetailsService userDetailsService) {
 
-	/**
-	 * Configura la cadena de filtros de seguridad HTTP. Define reglas de acceso,
-	 * manejo de sesiones y filtros de autenticación.
-	 *
-	 * @param http Configuración de seguridad HTTP
-	 * @return Cadena de filtros de seguridad configurada
-	 * @throws Exception Si ocurre un error durante la configuración
-	 */
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth
-				// 1. CUALQUIERA puede intentar loguearse o registrarse
-				.requestMatchers("/api/auth/**").permitAll()
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.userDetailsService = userDetailsService;
+    }
 
-				// 2. CUALQUIERA puede ver Swagger (documentación)
-				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+    /**
+     * Configuración principal de seguridad HTTP.
+     *
+     * @param http configuración HTTP
+     * @return cadena de filtros de seguridad
+     * @throws Exception excepción de configuración
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
-				// 3. Usuarios y Admins pueden ver la lista y contar
-				.requestMatchers("/api/usuarios/listar", "/api/usuarios/contar").hasAnyRole("USUARIO", "ADMINISTRATIVO")
+        http
+            .csrf(csrf -> csrf.disable())
 
-				// 4. SOLO el Administrativo puede borrar o actualizar usuarios
-				.requestMatchers("/api/usuarios/eliminar/**", "/api/usuarios/actualizar/**").hasRole("ADMINISTRATIVO")
+            .authorizeHttpRequests(auth -> auth
 
-				// 5. Todo lo demás requiere que el usuario esté al menos logueado
-				.anyRequest().authenticated())
+                // Endpoints públicos
+                .requestMatchers("/auth/**").permitAll()
 
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authenticationProvider(authenticationProvider())
-				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                // Swagger
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**")
+                .permitAll()
 
-		return http.build();
-	}
+                // Usuarios autenticados
+                .requestMatchers(
+                        "/user/getall",
+                        "/user/count",
+                        "/user/exists/**",
+                        "/user/getbyid/**")
+                .hasAnyRole("USUARIO", "ADMINISTRADOR")
 
-	/**
-	 * Configura el proveedor de autenticación. Establece el servicio de detalles de
-	 * usuario y el codificador de contraseñas.
-	 *
-	 * @return Proveedor de autenticación configurado
-	 */
-	@Bean
-	public AuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-		authProvider.setUserDetailsPasswordService(null);
-		authProvider.setPasswordEncoder(passwordEncoder());
+                // Solo administrador
+                .requestMatchers("/user/**")
+                .hasRole("ADMINISTRADOR")
 
-		return authProvider;
-	}
+                // Todo lo demás requiere autenticación
+                .anyRequest()
+                .authenticated()
+            )
 
-	/**
-	 * Configura el gestor de autenticación.
-	 *
-	 * @param config Configuración de autenticación
-	 * @return Gestor de autenticación
-	 * @throws Exception Si ocurre un error durante la configuración
-	 */
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-		return config.getAuthenticationManager();
-	}
+            // API Stateless con JWT
+            .sessionManagement(session ->
+                    session.sessionCreationPolicy(
+                            SessionCreationPolicy.STATELESS))
 
-	/**
-	 * Configura el codificador de contraseñas. Utiliza BCrypt para el hash de
-	 * contraseñas.
-	 *
-	 * @return Codificador de contraseñas BCrypt
-	 */
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+            // Proveedor de autenticación
+            .authenticationProvider(authenticationProvider())
+
+            // Filtro JWT
+            .addFilterBefore(
+                    jwtAuthFilter,
+                    UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    /**
+     * Proveedor de autenticación usando UserDetailsService.
+     *
+     * @return AuthenticationProvider
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+
+        DaoAuthenticationProvider authProvider =
+                new DaoAuthenticationProvider(userDetailsService);
+
+        authProvider.setPasswordEncoder(passwordEncoder());
+
+        return authProvider;
+    }
+
+    /**
+     * AuthenticationManager de Spring.
+     *
+     * @param config configuración de autenticación
+     * @return AuthenticationManager
+     * @throws Exception excepción de configuración
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config)
+            throws Exception {
+
+        return config.getAuthenticationManager();
+    }
+
+    /**
+     * Codificador BCrypt para contraseñas.
+     *
+     * @return PasswordEncoder
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+
+        return new BCryptPasswordEncoder();
+    }
 }

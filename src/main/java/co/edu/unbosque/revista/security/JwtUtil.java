@@ -121,7 +121,7 @@ public class JwtUtil {
     // Añadir rol a las reclamaciones si userDetails es de nuestra clase User
     if (userDetails instanceof Usuario) {
     	Usuario user = (Usuario) userDetails;
-      claims.put("role", user.getRole().name());
+      claims.put("role", user.getRol().name());
     }
 
     return createToken(claims, userDetails.getUsername());

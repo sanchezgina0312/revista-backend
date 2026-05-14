@@ -26,7 +26,7 @@ public class ComentarioService {
 		if (data.getTexto() == null || data.getTexto().isBlank()) {
 			return 1;
 		}
-		if (data.getPublicacionId() == null || data.getAutorId() == null) {
+		if (data.getPublicacionId() == null || data.getEditorId() == null) {
 			return 1;
 		}
 
@@ -63,11 +63,10 @@ public class ComentarioService {
 	}
 
 	public List<ComentarioDTO> findByPublicacionId(Long publicacionId) {
-		Optional<List<Comentario>> encontrados = comentarioRep.findByPublicacionId(publicacionId);
-		List<ComentarioDTO> dtoList = new ArrayList<>();
-		if (encontrados.isPresent() && !encontrados.get().isEmpty()) {
-			encontrados.get().forEach(entity -> dtoList.add(mapper.map(entity, ComentarioDTO.class)));
-		}
-		return dtoList;
-	}
-}
+	    Optional<Comentario> encontradoOpt = comentarioRep.findByPublicacionId(publicacionId);
+	    List<ComentarioDTO> dtoList = new ArrayList<>();
+	    if (encontradoOpt.isPresent()) {
+	        dtoList.add(mapper.map(encontradoOpt.get(), ComentarioDTO.class));
+	    }
+	    return dtoList;
+	}}
