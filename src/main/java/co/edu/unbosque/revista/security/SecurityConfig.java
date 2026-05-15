@@ -31,16 +31,16 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth
 				.requestMatchers("/revista/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+				.requestMatchers("/revista/publicaciones/crear")
+				.hasAnyRole("ADMINISTRADOR", "EDITOR")
+				.requestMatchers("/revista/publicaciones/actualizar/**", "/revista/publicaciones/eliminar/**")
+				.hasRole("ADMINISTRADOR")
 				.requestMatchers("/revista/publicaciones/listar", "/revista/publicaciones/buscar/**")
 				.hasAnyRole("USUARIO", "COMENTADOR", "EDITOR", "ADMINISTRADOR")
-				.requestMatchers("/revista/publicaciones/crear", "/revista/publicaciones/actualizar/**",
-						"/revista/publicaciones/eliminar/**")
-				.hasAnyRole("ADMINISTRADOR").requestMatchers("/revista/publicaciones/crear").hasAnyRole("EDITOR")
-
 				.requestMatchers("/revista/comentarios/crear").hasAnyRole("COMENTADOR", "EDITOR", "ADMINISTRADOR")
-				.requestMatchers("/revista/usuarios/**", "/revista/comentarios/listar",
-						"/revista/comentarios/eliminar/**")
-				.hasRole("ADMINISTRADOR").anyRequest().authenticated())
+				.requestMatchers("/revista/usuarios/**", "/revista/comentarios/listar", "/revista/comentarios/eliminar/**")
+				.hasRole("ADMINISTRADOR")
+				.anyRequest().authenticated())
 
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider())
