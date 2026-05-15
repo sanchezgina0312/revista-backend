@@ -14,299 +14,88 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuración principal de OpenAPI (Swagger) para la API REST de la revista digital.
- *
- * <p>
- * Esta clase centraliza:
- * </p>
- *
- * <ul>
- *   <li>Información general de la API</li>
- *   <li>Configuración de autenticación JWT</li>
- *   <li>Descripción de roles y permisos</li>
- *   <li>Respuestas reutilizables</li>
- *   <li>Documentación interactiva Swagger UI</li>
- * </ul>
- *
- * <h2>Roles disponibles en el sistema</h2>
- *
- * <ul>
- *   <li><b>USUARIO</b>: Puede consultar publicaciones</li>
- *   <li><b>COMENTADOR</b>: Puede crear comentarios</li>
- *   <li><b>EDITOR</b>: Puede crear publicaciones y comentarios</li>
- *   <li><b>ADMINISTRADOR</b>: Control total del sistema</li>
- * </ul>
- *
- * <h2>Flujo básico de autenticación</h2>
- *
- * <ol>
- *   <li>Registrar usuario usando <code>/auth/register</code></li>
- *   <li>Iniciar sesión usando <code>/auth/login</code></li>
- *   <li>Copiar el token JWT recibido</li>
- *   <li>Usar el botón "Authorize" de Swagger</li>
- *   <li>Ingresar: <code>Bearer tu_token</code></li>
- * </ol>
- */
 @Configuration
 public class OpenApiConfig {
 
-    /**
-     * Configuración personalizada de OpenAPI.
-     *
-     * @return objeto OpenAPI configurado
-     */
     @Bean
     public OpenAPI customOpenAPI() {
 
-        String descripcionPrincipal =
-                """
-                <h1>API REST - Revista Digital</h1>
+        String descripcionPrincipal = """
+                # API REST - Revista Digital
+                
+                Esta API permite administrar usuarios, publicaciones y comentarios dentro de una revista digital utilizando autenticación JWT y control de acceso basado en roles.
 
-                <p>
-                Esta API permite administrar usuarios, publicaciones y comentarios
-                dentro de una revista digital utilizando autenticación JWT y control
-                de acceso basado en roles.
-                </p>
+                ## Módulos del sistema
+                * **Autenticación**: Login y registro
+                * **Usuarios**: Gestión completa de usuarios
+                * **Publicaciones**: Noticias y horóscopos
+                * **Comentarios**: Comentarios asociados a publicaciones
 
-                <h2>Módulos del sistema</h2>
+                ## Roles y permisos
+                | Rol | Descripción de Permisos |
+                | :--- | :--- |
+                | **USUARIO** | Consultar publicaciones |
+                | **COMENTADOR** | Consultar publicaciones y crear comentarios |
+                | **EDITOR** | Crear publicaciones y comentarios |
+                | **ADMINISTRADOR** | Control total del sistema |
 
-                <ul>
-                    <li><b>Autenticación</b>: Login y registro</li>
-                    <li><b>Usuarios</b>: Gestión completa de usuarios</li>
-                    <li><b>Publicaciones</b>: Noticias y horóscopos</li>
-                    <li><b>Comentarios</b>: Comentarios asociados a publicaciones</li>
-                </ul>
+                ## Endpoints protegidos
+                ### Publicaciones
+                * **LISTAR / BUSCAR** → USUARIO, COMENTADOR, EDITOR, ADMINISTRADOR
+                * **CREAR** → EDITOR y ADMINISTRADOR
+                * **ACTUALIZAR / ELIMINAR** → ADMINISTRADOR
 
-                <h2>Roles y permisos</h2>
+                ### Comentarios
+                * **CREAR** → COMENTADOR, EDITOR, ADMINISTRADOR
+                * **LISTAR / ELIMINAR** → ADMINISTRADOR
 
-                <table border="1" cellpadding="5">
-                    <tr>
-                        <th>Rol</th>
-                        <th>Permisos</th>
-                    </tr>
+                ### Usuarios
+                * **Todos los endpoints** → ADMINISTRADOR
 
-                    <tr>
-                        <td>USUARIO</td>
-                        <td>Consultar publicaciones</td>
-                    </tr>
-
-                    <tr>
-                        <td>COMENTADOR</td>
-                        <td>Consultar publicaciones y crear comentarios</td>
-                    </tr>
-
-                    <tr>
-                        <td>EDITOR</td>
-                        <td>Crear publicaciones y comentarios</td>
-                    </tr>
-
-                    <tr>
-                        <td>ADMINISTRADOR</td>
-                        <td>Control total del sistema</td>
-                    </tr>
-                </table>
-
-                <h2>Endpoints protegidos</h2>
-
-                <ul>
-                    <li>
-                        <b>Publicaciones</b>
-                        <ul>
-                            <li>LISTAR / BUSCAR → USUARIO, COMENTADOR, EDITOR, ADMINISTRADOR</li>
-                            <li>CREAR → EDITOR y ADMINISTRADOR</li>
-                            <li>ACTUALIZAR / ELIMINAR → ADMINISTRADOR</li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <b>Comentarios</b>
-                        <ul>
-                            <li>CREAR → COMENTADOR, EDITOR, ADMINISTRADOR</li>
-                            <li>LISTAR / ELIMINAR → ADMINISTRADOR</li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <b>Usuarios</b>
-                        <ul>
-                            <li>Todos los endpoints → ADMINISTRADOR</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h2>Códigos HTTP comunes</h2>
-
-                <ul>
-                    <li><b>200</b>: Operación exitosa</li>
-                    <li><b>201</b>: Recurso creado</li>
-                    <li><b>202</b>: Operación aceptada</li>
-                    <li><b>400</b>: Error en la solicitud</li>
-                    <li><b>401</b>: No autenticado</li>
-                    <li><b>403</b>: Acceso denegado</li>
-                    <li><b>404</b>: Recurso no encontrado</li>
-                    <li><b>406</b>: Datos inválidos</li>
-                    <li><b>409</b>: Conflicto de información</li>
-                </ul>
+                ## Códigos HTTP comunes
+                * **200**: Operación exitosa | **201**: Recurso creado | **202**: Operación aceptada
+                * **400**: Error en la solicitud | **401**: No autenticado | **403**: Acceso denegado
+                * **404**: Recurso no encontrado | **406**: Datos inválidos | **409**: Conflicto de información
                 """;
 
-        String descripcionSeguridad =
-                """
+        String descripcionSeguridad = """
                 Autenticación basada en JWT (JSON Web Token).
 
-                <h3>¿Cómo autenticarse?</h3>
-
-                <ol>
-                    <li>Inicia sesión usando <code>/auth/login</code></li>
-                    <li>Obtén el token JWT</li>
-                    <li>Haz clic en el botón <b>Authorize</b></li>
-                    <li>Escribe:
-                        <code>Bearer tu_token_jwt</code>
-                    </li>
-                    <li>Presiona Authorize</li>
-                </ol>
-
-                <p>
-                Una vez autenticado podrás consumir los endpoints protegidos
-                según los permisos de tu rol.
-                </p>
+                ### ¿Cómo autenticarse?
+                1. Inicia sesión usando `/auth/login`
+                2. Obtén el token JWT de la respuesta
+                3. Haz clic en el botón **Authorize** (candado verde)
+                4. Escribe exactamente: `Bearer tu_token_jwt`
+                5. Presiona **Authorize** y luego **Close**
+                
+                Una vez autenticado podrás consumir los endpoints protegidos según los permisos de tu rol.
                 """;
 
         Info info = new Info()
                 .title("API REST - Revista Digital")
                 .version("1.0")
                 .description(descripcionPrincipal)
-                .contact(
-                        new Contact()
-                                .name("Equipo de Desarrollo")
-                                .email("revista@unbosque.edu.co")
-                                .url("https://github.com/unbosque/revista-api")
-                )
-                .license(
-                        new License()
-                                .name("MIT")
-                                .url("https://opensource.org/licenses/MIT")
-                );
-
-        SecurityScheme securityScheme = new SecurityScheme()
-                .name("JWT Authentication")
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT")
-                .description(descripcionSeguridad);
+                .contact(new Contact().name("Equipo de Desarrollo").email("revista@unbosque.edu.co").url("https://github.com/unbosque/revista-api"))
+                .license(new License().name("MIT").url("https://opensource.org/licenses/MIT"));
 
         return new OpenAPI()
                 .info(info)
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .components(new Components()
+                        .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                                .name("JWT Authentication")
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                                .description(descripcionSeguridad))
+                        .addResponses("UnauthorizedError", createResponse("Token inválido", "Unauthorized", "Token JWT inválido o expirado"))
+                        .addResponses("ForbiddenError", createResponse("Sin permisos", "Forbidden", "Acceso denegado"))
+                        .addResponses("NotFoundError", createResponse("No encontrado", "Not Found", "El recurso no existe"))
+                        .addResponses("ConflictError", createResponse("Conflicto", "Conflict", "El recurso ya existe")));
+    }
 
-                // Seguridad global
-                .addSecurityItem(
-                        new SecurityRequirement().addList("bearerAuth")
-                )
-
-                .components(
-                        new Components()
-
-                                // JWT
-                                .addSecuritySchemes(
-                                        "bearerAuth",
-                                        securityScheme
-                                )
-
-                                // 401
-                                .addResponses(
-                                        "UnauthorizedError",
-                                        new ApiResponse()
-                                                .description("Token inválido o expirado")
-                                                .content(
-                                                        new Content()
-                                                                .addMediaType(
-                                                                        "application/json",
-                                                                        new MediaType()
-                                                                                .addExamples(
-                                                                                        "error",
-                                                                                        new Example()
-                                                                                                .value("""
-                                                                                                    {
-                                                                                                      "error": "Unauthorized",
-                                                                                                      "message": "Token JWT inválido o expirado"
-                                                                                                    }
-                                                                                                    """)
-                                                                                )
-                                                                )
-                                                )
-                                )
-
-                                // 403
-                                .addResponses(
-                                        "ForbiddenError",
-                                        new ApiResponse()
-                                                .description("No tienes permisos suficientes")
-                                                .content(
-                                                        new Content()
-                                                                .addMediaType(
-                                                                        "application/json",
-                                                                        new MediaType()
-                                                                                .addExamples(
-                                                                                        "error",
-                                                                                        new Example()
-                                                                                                .value("""
-                                                                                                    {
-                                                                                                      "error": "Forbidden",
-                                                                                                      "message": "Acceso denegado para este recurso"
-                                                                                                    }
-                                                                                                    """)
-                                                                                )
-                                                                )
-                                                )
-                                )
-
-                                // 404
-                                .addResponses(
-                                        "NotFoundError",
-                                        new ApiResponse()
-                                                .description("Recurso no encontrado")
-                                                .content(
-                                                        new Content()
-                                                                .addMediaType(
-                                                                        "application/json",
-                                                                        new MediaType()
-                                                                                .addExamples(
-                                                                                        "error",
-                                                                                        new Example()
-                                                                                                .value("""
-                                                                                                    {
-                                                                                                      "error": "Not Found",
-                                                                                                      "message": "El recurso solicitado no existe"
-                                                                                                    }
-                                                                                                    """)
-                                                                                )
-                                                                )
-                                                )
-                                )
-
-                                // 409
-                                .addResponses(
-                                        "ConflictError",
-                                        new ApiResponse()
-                                                .description("Conflicto de información")
-                                                .content(
-                                                        new Content()
-                                                                .addMediaType(
-                                                                        "application/json",
-                                                                        new MediaType()
-                                                                                .addExamples(
-                                                                                        "error",
-                                                                                        new Example()
-                                                                                                .value("""
-                                                                                                    {
-                                                                                                      "error": "Conflict",
-                                                                                                      "message": "El recurso ya existe"
-                                                                                                    }
-                                                                                                    """)
-                                                                                )
-                                                                )
-                                                )
-                                )
-                );
+    private ApiResponse createResponse(String d, String e, String m) {
+        return new ApiResponse().description(d).content(new Content().addMediaType("application/json", 
+                new MediaType().addExamples("error", new Example().value("{\"error\": \""+e+"\", \"message\": \""+m+"\"}"))));
     }
 }
