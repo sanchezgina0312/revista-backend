@@ -3,12 +3,6 @@ package co.edu.unbosque.revista.dto;
 import java.util.Objects;
 
 import co.edu.unbosque.revista.entity.Usuario.Role;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 public class UsuarioDTO {
 

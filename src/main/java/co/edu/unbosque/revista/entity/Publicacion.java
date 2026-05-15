@@ -1,6 +1,8 @@
 package co.edu.unbosque.revista.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,7 +18,8 @@ public class Publicacion {
 
 	private String titulo;
 	private String contenido;
-	private String tipo;
+	@Enumerated(EnumType.STRING)
+	private TipoPublicacion tipo;
 	private LocalDateTime fechaCreacion;
 	private Long editorId;
 
@@ -24,13 +27,18 @@ public class Publicacion {
 
 	}
 
-	public Publicacion(String titulo, String contenido, String tipo, LocalDateTime fechaCreacion, Long editorId) {
+	public Publicacion(String titulo, String contenido, TipoPublicacion tipo, LocalDateTime fechaCreacion,
+			Long editorId) {
 		super();
 		this.titulo = titulo;
 		this.contenido = contenido;
 		this.tipo = tipo;
 		this.fechaCreacion = fechaCreacion;
 		this.editorId = editorId;
+	}
+
+	public enum TipoPublicacion {
+		NOTICIA, HOROSCOPO
 	}
 
 	public Long getId() {
@@ -57,11 +65,11 @@ public class Publicacion {
 		this.contenido = contenido;
 	}
 
-	public String getTipo() {
+	public TipoPublicacion getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(String tipo) {
+	public void setTipo(TipoPublicacion tipo) {
 		this.tipo = tipo;
 	}
 

@@ -3,12 +3,14 @@ package co.edu.unbosque.revista.dto;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import co.edu.unbosque.revista.entity.Publicacion.TipoPublicacion;
+
 public class PublicacionDTO {
 
 	private Long id;
 	private String titulo;
 	private String contenido;
-	private String tipo;
+	private TipoPublicacion tipo;
 	private LocalDateTime fechaCreacion;
 	private Long editorId;
 
@@ -16,7 +18,8 @@ public class PublicacionDTO {
 
 	}
 
-	public PublicacionDTO(String titulo, String contenido, String tipo, LocalDateTime fechaCreacion, Long editorId) {
+	public PublicacionDTO(String titulo, String contenido, TipoPublicacion tipo, LocalDateTime fechaCreacion,
+			Long editorId) {
 		super();
 		this.titulo = titulo;
 		this.contenido = contenido;
@@ -49,11 +52,11 @@ public class PublicacionDTO {
 		this.contenido = contenido;
 	}
 
-	public String getTipo() {
+	public TipoPublicacion getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(String tipo) {
+	public void setTipo(TipoPublicacion tipo) {
 		this.tipo = tipo;
 	}
 
@@ -89,7 +92,7 @@ public class PublicacionDTO {
 		PublicacionDTO other = (PublicacionDTO) obj;
 		return Objects.equals(contenido, other.contenido) && Objects.equals(editorId, other.editorId)
 				&& Objects.equals(fechaCreacion, other.fechaCreacion) && Objects.equals(id, other.id)
-				&& Objects.equals(tipo, other.tipo) && Objects.equals(titulo, other.titulo);
+				&& tipo == other.tipo && Objects.equals(titulo, other.titulo);
 	}
 
 	@Override
