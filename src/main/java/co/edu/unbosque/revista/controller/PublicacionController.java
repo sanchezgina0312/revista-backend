@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/revista/publicaciones")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8081"})
+@CrossOrigin(origins = { "*"})
 @Tag(name = "Publicación", description = "Gestión de noticias y horóscopos de la revista")
 public class PublicacionController {
 
