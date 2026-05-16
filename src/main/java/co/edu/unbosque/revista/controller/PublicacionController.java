@@ -79,4 +79,23 @@ public class PublicacionController {
 		List<PublicacionDTO> lista = publicacionSer.findByEditorId(editorId);
 		return (lista.isEmpty()) ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(lista, HttpStatus.OK);
 	}
+	
+	@Operation(summary = "Encriptar texto plano a Base64")
+	@PostMapping("/encriptar-texto")
+	public ResponseEntity<String> encriptarTexto(@RequestBody String texto) {
+		String cifrado = java.util.Base64.getEncoder().encodeToString(texto.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+		return new ResponseEntity<>(cifrado, HttpStatus.OK);
+	}
+
+	@Operation(summary = "Desencriptar Base64 a texto plano legible")
+	@PostMapping("/desencriptar-texto")
+	public ResponseEntity<String> desencriptarTexto(@RequestBody String textoCifrado) {
+		try {
+			byte[] decodedBytes = java.util.Base64.getDecoder().decode(textoCifrado.trim());
+			String descifrado = new String(decodedBytes, java.nio.charset.StandardCharsets.UTF_8);
+			return new ResponseEntity<>(descifrado, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(textoCifrado, HttpStatus.OK);
+		}
+	}
 }
