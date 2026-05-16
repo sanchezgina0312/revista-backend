@@ -61,7 +61,7 @@ public class AuthController {
 
 		} catch (AuthenticationException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("Error: Nombre de usuario o contraseña incorrectos.");
+					.body("Error: Correo o contraseña incorrectos.");
 		}
 	}
 

@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/revista/comentarios")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8081"})
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080", "http://localhost:8081"})
 @Tag(name = "Comentario", description = "Controlador para la gestión de comentarios en las publicaciones")
 public class ComentarioController {
 
