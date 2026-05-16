@@ -63,10 +63,22 @@ public class ComentarioService {
 	}
 
 	public List<ComentarioDTO> findByPublicacionId(Long publicacionId) {
-	    Optional<Comentario> encontradoOpt = comentarioRep.findByPublicacionId(publicacionId);
-	    List<ComentarioDTO> dtoList = new ArrayList<>();
-	    if (encontradoOpt.isPresent()) {
-	        dtoList.add(mapper.map(encontradoOpt.get(), ComentarioDTO.class));
-	    }
-	    return dtoList;
-	}}
+
+		Optional<List<Comentario>> comentariosOpt =
+				comentarioRep.findByPublicacionId(publicacionId);
+
+		List<ComentarioDTO> dtoList = new ArrayList<>();
+
+		if (comentariosOpt.isPresent()) {
+
+			List<Comentario> comentarios = comentariosOpt.get();
+
+			comentarios.forEach(c ->
+				dtoList.add(mapper.map(c, ComentarioDTO.class))
+			);
+		}
+
+		return dtoList;
+	}
+	
+}
