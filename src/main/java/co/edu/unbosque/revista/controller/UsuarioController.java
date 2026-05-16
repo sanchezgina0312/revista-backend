@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import co.edu.unbosque.revista.dto.UsuarioDTO;
 import co.edu.unbosque.revista.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
