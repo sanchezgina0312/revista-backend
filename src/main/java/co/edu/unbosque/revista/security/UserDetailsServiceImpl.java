@@ -1,45 +1,32 @@
 package co.edu.unbosque.revista.security;
 
+import co.edu.unbosque.revista.entity.Usuario;
 import co.edu.unbosque.revista.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 
-/**
- * Implementación del servicio de detalles de usuario para la autenticación.
- * Esta clase proporciona la funcionalidad necesaria para cargar los datos del
- * usuario desde el repositorio durante el proceso de autenticación.
- */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	/**
-	 * Repositorio de usuarios utilizado para buscar información de usuarios.
-	 */
-	private final UsuarioRepository userRepository;
+    @Autowired
+    private UsuarioRepository usuarioRep;
 
-	/**
-	 * Constructor que inicializa el repositorio de usuarios.
-	 * 
-	 * @param userRepository El repositorio de usuarios a utilizar para las
-	 *                       consultas
-	 */
-	public UserDetailsServiceImpl(UsuarioRepository userRepository) {
-		this.userRepository = userRepository;
-	}
-
-	/**
-	 * Carga los detalles del usuario por su nombre de usuario.
-	 * 
-	 * @param username El nombre de usuario para buscar
-	 * @return Los detalles del usuario encontrado
-	 * @throws UsernameNotFoundException Si no se encuentra el usuario con el nombre
-	 *                                   de usuario proporcionado
-	 */
-	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-	    return userRepository.findByCorreo(email)
-	        .orElseThrow(() -> new UsernameNotFoundException("No se encontró el correo: " + email));
-	}
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Usuario> usuario = usuarioRep.findByNombre(username);
+        
+        if (usuario.isEmpty()) {
+            usuario = usuarioRep.findByCorreo(username);
+        }
+        
+        if (usuario.isEmpty()) {
+            throw new UsernameNotFoundException("Usuario no encontrado: " + username);
+        }
+        
+        return usuario.get();
+    }
 }
