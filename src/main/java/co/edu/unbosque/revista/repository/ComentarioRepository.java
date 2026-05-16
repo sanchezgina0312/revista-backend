@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface ComentarioRepository extends CrudRepository<Comentario, Long> {
 	
-	public Optional<Comentario> findByPublicacionId(Long publicacionId);
+	Optional<List<Comentario>> findByPublicacionId(Long publicacionId);
 }
