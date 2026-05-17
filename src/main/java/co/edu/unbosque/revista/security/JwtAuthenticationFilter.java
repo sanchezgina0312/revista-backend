@@ -13,43 +13,18 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * Filtro de autenticación JWT que intercepta las solicitudes HTTP. Valida los
- * tokens JWT en las solicitudes y establece la autenticación en el contexto de
- * seguridad. Se ejecuta una vez por cada solicitud.
- */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	/** Utilidad para operaciones con tokens JWT. */
 	private final JwtUtil jwtUtil;
 
-	/** Servicio para cargar los detalles del usuario. */
 	private final UserDetailsService userDetailsService;
 
-	/**
-	 * Constructor que inicializa las dependencias necesarias para el filtro.
-	 *
-	 * @param jwtUtil            Utilidad para operaciones con tokens JWT
-	 * @param userDetailsService Servicio para cargar los detalles del usuario
-	 */
 	public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
 		this.jwtUtil = jwtUtil;
 		this.userDetailsService = userDetailsService;
 	}
 
-	/**
-	 * Método principal del filtro que se ejecuta para cada solicitud HTTP. Extrae y
-	 * valida el token JWT del encabezado de autorización. Si el token es válido,
-	 * establece la autenticación en el contexto de seguridad.
-	 *
-	 * @param request     Solicitud HTTP entrante
-	 * @param response    Respuesta HTTP saliente
-	 * @param filterChain Cadena de filtros para continuar el procesamiento
-	 * @throws ServletException Si ocurre un error durante el procesamiento del
-	 *                          servlet
-	 * @throws IOException      Si ocurre un error de entrada/salida
-	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {

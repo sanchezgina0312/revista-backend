@@ -78,8 +78,6 @@ public class UsuarioService {
         return 1;
     }
 
-    // --- CORRECCIÓN DE MÉTODOS DE BÚSQUEDA ---
-
     public List<UsuarioDTO> findByNombre(String nombre) {
         Optional<Usuario> encontrado = usuarioRep.findByNombre(nombre);
         List<UsuarioDTO> dtoList = new ArrayList<>();
